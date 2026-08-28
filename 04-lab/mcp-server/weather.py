@@ -1,7 +1,22 @@
 from typing import Any
 import asyncio
+# pyrefly: ignore [missing-import]
 import httpx
 import os
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+# Load .env từ thư mục hiện tại, client hoặc root
+load_dotenv()
+load_dotenv(Path(__file__).parent.parent / "mcp-client" / ".env")
+load_dotenv(Path(__file__).parent.parent.parent / ".env")
+
 from mcp.server.fastmcp import FastMCP
 
 # Initialize FastMCP server

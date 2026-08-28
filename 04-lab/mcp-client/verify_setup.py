@@ -7,6 +7,11 @@ import os
 import sys
 from pathlib import Path
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
 def check_environment():
     """Check if .env file exists and is configured"""
     print("🔍 Checking environment configuration...")
@@ -82,7 +87,7 @@ def check_mcp_server():
     """Check if MCP server is accessible"""
     print("\n🔍 Checking MCP server connectivity...")
     
-    server_url = "https://weather-mcp-server-oze7nwnjba-as.a.run.app"
+    server_url = os.getenv("MCP_SERVER_URL", "http://localhost:8085/mcp")
     
     try:
         import httpx
@@ -95,8 +100,8 @@ def check_mcp_server():
         
         status_code = asyncio.run(test_connection())
         
-        if status_code in [200, 404]:  # 404 is expected for GET on MCP endpoint
-            print(f"✅ MCP server reachable at {server_url}")
+        if status_code in [200, 404, 405, 406]:  # FastMCP streamable-http returns 406/405 on raw GET
+            print(f"✅ MCP server reachable at {server_url} (status: {status_code})")
             return True
         else:
             print(f"⚠️  MCP server returned status {status_code}")

@@ -9,12 +9,28 @@ Cách chạy:
     python weather_function_calling.py
 """
 
+import os
+import sys
+from pathlib import Path
+from dotenv import load_dotenv
+
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+if hasattr(sys.stderr, "reconfigure"):
+    sys.stderr.reconfigure(encoding="utf-8", errors="replace")
+
+# Load .env từ thư mục hiện tại hoặc thư mục gốc repo
+load_dotenv()
+load_dotenv(Path(__file__).parent.parent / ".env")
+
+api_key = os.getenv("GEMINI_API_KEY") or os.getenv("GOOGLE_API_KEY")
+
 from google import genai
 from google.genai import types
 
-client = genai.Client()
+client = genai.Client(api_key=api_key) if api_key else genai.Client()
 
-MODEL = "gemini-2.5-flash"
+MODEL = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
 
 SYSTEM_INSTRUCTION = (
     "Bạn là trợ lý thời tiết thân thiện, trả lời bằng tiếng Việt tự nhiên. "
